@@ -62,15 +62,15 @@
     "@nx/react": {
       "application": {
         "babel": true,
-        "style": "scss",
+        "style": "css",
         "linter": "eslint",
         "bundler": "webpack"
       },
       "component": {
-        "style": "scss"
+        "style": "css"
       },
       "library": {
-        "style": "scss",
+        "style": "css",
         "linter": "eslint"
       }
     }

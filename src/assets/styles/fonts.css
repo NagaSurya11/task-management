@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'Mulish';
+    src: url('../fonts/Mulish-Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Acumin Pro';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../fonts/Acumin-RPro.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-style: normal;
+    font-weight: normal;
+    src: url('../fonts/Urbanist-SemiBold.ttf') format('truetype');
+}

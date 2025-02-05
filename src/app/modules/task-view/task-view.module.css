@@ -1,0 +1,28 @@
+/*
+ * Replace this with your own classes
+ *
+ * e.g.
+ * .container {
+ * }
+*/
+.task-view {
+    width: 99%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.task-view-container {
+    display: flex;
+    flex-direction: row;
+    place-content: center;
+    width: 100%;
+    height: 95%;
+}
+
+.no_task_image_container {
+    display: flex;
+    place-content: center;
+    place-items: center;
+    height: 100%;
+}

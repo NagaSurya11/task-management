@@ -1,0 +1,123 @@
+/* src/assets/variables.css */
+
+:root {
+
+    /* =======================
+       Background Colors
+    ======================= */
+    --background-lightest: #ffffff;
+    /* Lightest background color */
+
+    --background-light: #FFF9F9;
+    /* Light background color */
+
+    --background-primary: #FAC3FF;
+    /* Primary background color */
+
+    --background-secondary: #F1F1F1;
+    /* Secondary background color */
+
+    --background-accent: #CEFFCC;
+    /* Accent background color */
+
+    --background-muted: #EAECF0;
+    /* Muted background color */
+
+    --background-primary-dark: #7B1984;
+    /* Custom background color 1 */
+
+    --background-secondary-dark: #85D9F1;
+    /* Cyan Background */
+
+    --background-tertiary: #A2D6A0; 
+
+    --background-tertiary-dark: #292929;
+
+    --background-secondary-light: #fff;
+    --background-secondary-contrast: #F1F1F15C;
+
+    /* =======================
+       Text Colors
+    ======================= */
+    --text-primary: #000000;
+    /* Primary text color */
+
+    --text-secondary: #2F2F2F;
+    /* Secondary text color */
+
+    --text-muted: #231F20D1;
+    /* Muted text color */
+
+    --text-light: #00000099;
+    /* Light text color (used in dark backgrounds) */
+
+    --text-dark: #000000D1;
+    /* Dark text color */
+
+    --text-inverted: #ffffff;
+    /* Text color for dark backgrounds */
+
+    --text-accent: #000000CC;
+    /* Accent text color */
+
+    --text-warn: #DA2F2F;
+    /* Warning text color */
+
+    --text-grey: #00000085;
+
+    --text-tertiary: #1E212A;
+
+    --text-color-active: #2956DD;
+
+    /* =======================
+       Border Colors
+    ======================= */
+    --border-light: #0000006B;
+    /* Light border color */
+
+    --border-muted: #00000033;
+    /* Muted border color */
+
+    --border-primary: #7B198426;
+    /* Primary border color */
+
+    --border-dark: #0000001A;
+    /* Dark border color */
+
+    --border-grey: #58575112;
+
+    --border-lightest: #00000021;
+
+    /* =======================
+       Font Variables
+    ======================= */
+    --font-family-primary: 'Mulish';
+    --font-family-secondary: 'Acumin Pro';
+    --font-family-tertiary: 'Urbanist';
+    /* Font families */
+
+    --font-size-lg: 24px;
+    --font-size-mlg: 21px;
+    --font-size-md: 16px;
+    --font-size-sm: 15px;
+    --font-size-xs: 14px;
+    --font-size-xxs: 12px;
+    --font-size-xxxs: 10px;
+    --font-size-heading: 18px;
+    /* Font sizes for various text elements */
+
+    --font-weight-bold: 700;
+    --font-weight-semibold: 600;
+    --font-weight-medium: 500;
+    --font-weight-regular: 400;
+    /* Font weights for different emphasis */
+
+    --base-loader-background: #fff;
+    /* Skeleton Loader */
+
+    --overlay-background: #00000080;
+
+    --scrollbar-track: #D9D9D97D;
+    --scrollbar-thumb: #D9D9D9;
+
+}

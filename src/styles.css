@@ -1,0 +1,46 @@
+/* You can add global styles to this file, and also import other style files */
+/* Your styles goes here. */
+
+@import url('assets/styles/variables.css');
+@import url('assets/styles/fonts.css');
+
+body {
+    font-family: var(--font-family-primary);
+    background: var(--background-lightest);
+    overflow: hidden;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#root {
+    height: 98vh;
+}
+
+/* WebKit (Safari, Chrome, Edge) */
+::-webkit-scrollbar {
+    width: 6px;
+    /* Width of the scrollbar */
+    height: 6px;
+    /* Height of the scrollbar (for horizontal scrolling) */
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    /* Scrollbar color */
+    border-radius: 4px;
+    /* Rounded corners */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb);
+}
+
+/* Track (the background) */
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 8px;
+}

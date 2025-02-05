@@ -1,0 +1,169 @@
+.task_details_container {
+    padding: .5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.task_details_container__title {
+    width: 630px;
+    height: 38px;
+    border: 1px solid;
+    border-color: var(--border-lightest);
+    padding: 0 .5rem;
+    background: var(--background-secondary);
+    border-radius: 8px;
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
+    outline: unset;
+    min-height: 38px;
+}
+
+.task_details_container__description {
+    height: 123px;
+    border-radius: 8px;
+    background: var(--background-secondary);
+    padding: .75rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    background: var(--background-secondary);
+    border-radius: 8px;
+}
+
+.task_details_container__description__placeholder {
+    display: flex;
+    place-items: center;
+    gap: .5rem;
+}
+
+.task_details_container__description__characters_length {
+    position: absolute;
+    right: .75rem;
+    bottom: .75rem;
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-tertiary);
+    opacity: .4;
+}
+
+.task_details_container__cds__due_on_date_btn,
+.task_details_container__cds__status_btn {
+    display: flex;
+    place-items: center;
+    height: 32px;
+    width: 195px;
+    border: 1px solid var(--border-muted);
+    justify-content: space-between;
+    border-radius: 8px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+    background: var(--background-secondary-contrast);
+}
+
+.task_details_container__cds__due_on_date_btn.active,
+.task_details_container__cds__status_btn.active {
+    color: var(--text-primary);
+}
+
+.task_details_container__cds {
+    display: flex;
+    justify-content: space-between;
+}
+
+.task_details_container__cds__task_category,
+.task_details_container__cds__due_on,
+.task_details_container__cds__status {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.task_details_container__cds__task_category__label,
+.task_details_container__cds__due_on__label,
+.task_details_container__cds__status__label,
+.task_details_container__attachment__label
+ {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xxs);
+    color: var(--text-light);
+}
+
+.task_details_container__cds__task_category__btn_container {
+    display: flex;
+    gap: .5rem
+}
+
+.task_details_container__attachment_container {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.task_details_container__attachment_container__drag_drop_container__text {
+    height: 43px;
+    border: 1px solid var(--border-muted);
+    border-radius: 8px;
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-tertiary);
+    background: var(--background-secondary-contrast);
+    display: flex;
+    place-items: center;
+    place-content: center;
+    gap: .25rem;
+}
+
+.task_details_container__attachment_container__drag_drop_container__upload_btn {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    color: var(--text-color-active);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.task_details_container__attachments_list{
+    display: flex
+    ;
+        flex-direction: column;
+        gap: .5rem;
+}
+
+.task_details_container__attachments_list__item {
+    height: 40px;
+    place-items: center;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 0 .5rem;
+    display: grid;
+    grid-template-columns: 1fr 24px;
+}
+
+.task_details_container__attachments_list__item>a {
+    display: flex;
+    place-items: center;
+    gap: 1rem;
+    width: 100%;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+}
+.task_details_container__attachments_list__item>a>svg {
+    height: 30px;
+    width: 30px;
+}
+
+.close_outline {
+    cursor: pointer;
+    opacity: .5;
+}

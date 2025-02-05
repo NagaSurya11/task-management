@@ -1,0 +1,35 @@
+/*
+ * Replace this with your own classes
+ *
+ * e.g.
+ * .container {
+ * }
+*/
+
+.menu {
+    background: var(--background-light);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    box-shadow: 0px 4px 4px 0 #7B19841F;
+    padding: 0.5rem 0;
+}
+
+.menu_item {
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    font-size: var(--font-size-xxs);
+    padding: .5rem .75rem;
+    display: flex;
+    place-items: center;
+    gap: .5rem;
+    min-width: 111px;
+}
+
+.menu_item.warn {
+    color: var(--text-warn);
+}
+
+.menu_item:hover {
+    background: var(--background-muted);
+    outline: unset;
+}

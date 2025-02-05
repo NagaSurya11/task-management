@@ -1,0 +1,33 @@
+.text_editor_container {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.ql-toolbar.ql-snow {
+    border: unset !important;
+    padding: 0 !important;
+}
+
+.ql-container.ql-snow {
+    overflow: auto !important;
+    height: 50px !important;
+    border: unset !important;
+    width: 605px;
+}
+
+.ql-editor {
+    padding: 0 10px !important;
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
+}
+
+.ql-toolbar.ql-snow .ql-formats {
+    margin-right: 5px !important;
+}
+
+.ql-toolbar.ql-snow> *:first-child {
+    border-right: 1px solid !important;
+    border-color: var(--border-muted) !important;
+}
+
