@@ -6,8 +6,9 @@ on:
       - master
 
 jobs:
-  install:
+  build:
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,11 +19,6 @@ jobs:
           cache: 'npm'
 
       - run: npm ci --force
-  build:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
       - run: npx nx --version
       - run: npx nx run task-management:build
 
