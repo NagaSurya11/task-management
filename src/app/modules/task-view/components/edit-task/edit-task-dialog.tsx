@@ -106,7 +106,7 @@ export const EditTaskDialog: React.FC = () => {
     }, [dialogState?.task])
 
     return (
-        <DialogContainer id="edit_task" confirmText="UPDATE" errorReason={errors?.length > 0 ? errors[0].errors[0] : undefined} open={dialogState?.open ?? false} onCancel={handleCancel} onConfirm={handleConfirm} canConfirm={!!errors && errors.length > 0} title="" key={'edit_task_dialog'}>
+        <DialogContainer id="edit_task" confirmText="UPDATE" errorReason={errors?.length > 0 ? errors[0].errors[0] : undefined} open={dialogState?.open ?? false} onCancel={handleCancel} onConfirm={handleConfirm} canConfirm={dialogState?.isLoading ?? (!!errors && errors.length > 0)} title="" key={'edit_task_dialog'}>
             {!!dialogState?.task ?
                 <div className={styles['edit_dialog_container']}>
                     <TaskDetailsContainer onFormValueChange={onFormValueChange} task={dialogState.task} attachments={attachments} />

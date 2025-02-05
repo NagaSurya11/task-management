@@ -163,24 +163,27 @@ export const editTask = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/editTask`, (e
 
       const batch = writeBatch(db);
       batch.set(taskDocument, task);
-      
-      const attachmentsCollectionRef = collection(taskDocument, "attachments");
-      const existingAttachments = (await getDocs(attachmentsCollectionRef)).docs;
-      const currentAttachmentIds = new Set(attachments.map(attachment => attachment.fileId));
-      const existingAttachmentIds = new Set(existingAttachments.map(document => document.id));
-      
-      existingAttachments
-        .filter(document => !currentAttachmentIds.has(document.id))
-        .forEach(document => {
-          batch.delete(doc(attachmentsCollectionRef, document.id));
-      })
+
+      if (!editTaskInput.isSilentUpdate) {
+        const attachmentsCollectionRef = collection(taskDocument, "attachments");
+        const existingAttachments = (await getDocs(attachmentsCollectionRef)).docs;
+        const currentAttachmentIds = new Set(attachments.map(attachment => attachment.fileId));
+        const existingAttachmentIds = new Set(existingAttachments.map(document => document.id));
+
+        existingAttachments
+          .filter(document => !currentAttachmentIds.has(document.id))
+          .forEach(document => {
+            batch.delete(doc(attachmentsCollectionRef, document.id));
+          })
 
 
-      attachments
-      .filter(attachment => !existingAttachmentIds.has(attachment.fileId))
-      .forEach(attachment => {
-        batch.set(doc(attachmentsCollectionRef, attachment.fileId), attachment);
-      });
+        attachments
+          .filter(attachment => !existingAttachmentIds.has(attachment.fileId))
+          .forEach(attachment => {
+            batch.set(doc(attachmentsCollectionRef, attachment.fileId), attachment);
+          });
+
+      }
 
       await batch.commit();
       resolve({ status: true });
