@@ -1,6 +1,7 @@
 const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { NxReactWebpackPlugin } = require('@nx/react/webpack-plugin');
 const { join } = require('path');
+const webpack = require('webpack'); // Import webpack for DefinePlugin
 
 module.exports = {
   output: {
@@ -27,9 +28,17 @@ module.exports = {
       optimization: process.env['NODE_ENV'] === 'production',
     }),
     new NxReactWebpackPlugin({
-      // Uncomment this line if you don't want to use SVGR
-      // See: https://react-svgr.com/
-      svgr: true
+      svgr: true // Keep this if you want to use SVGR
+    }),
+    // Remove Dotenv plugin
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_API_KEY': JSON.stringify(process.env.REACT_APP_API_KEY),
+      'process.env.REACT_APP_AUTH_DOMAIN': JSON.stringify(process.env.REACT_APP_AUTH_DOMAIN),
+      'process.env.REACT_APP_PROJECT_ID': JSON.stringify(process.env.REACT_APP_PROJECT_ID),
+      'process.env.REACT_APP_STORAGE_BUCKET': JSON.stringify(process.env.REACT_APP_STORAGE_BUCKET),
+      'process.env.REACT_APP_MESSAGE_SENDER_ID': JSON.stringify(process.env.REACT_APP_MESSAGE_SENDER_ID),
+      'process.env.REACT_APP_APP_ID': JSON.stringify(process.env.REACT_APP_APP_ID),
+      // Add any other environment variables here
     }),
   ],
 };
