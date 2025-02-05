@@ -23,7 +23,8 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
-      - run: npm run build
+      - run: npx nx --version
+      - run: npx nx run task-management:build
 
   deploy:
     runs-on: ubuntu-latest
