@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm install -g nx
-      - run: npm install --force
+      - run: npm ci --force
 
   build:
     runs-on: ubuntu-latest
