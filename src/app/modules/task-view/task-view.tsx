@@ -38,13 +38,13 @@ export function TaskView() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 100,
+        delay: 300,
         tolerance: 5
       }
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100,
+        delay: 300,
         tolerance: 5
       }
     })
