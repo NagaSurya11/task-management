@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,11 +19,6 @@ jobs:
       - run: npm ci --force  # Install dependencies
       - run: npx nx --version  # Verifies that Nx is installed
       - run: npx nx run task-management:build  # Build the specific task-management project
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
