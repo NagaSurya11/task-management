@@ -8,17 +8,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-        - uses: actions/setup-node@v4
-          with:
-            node-version: 20
-            cache: 'npm'
-        - run: npm ci --force
-        - run: npx nx --version
-        - run: npx nx run task-management:build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures the full history for Nx commands
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'  # Caches npm dependencies for faster future builds
+      - run: npm ci --force  # Install dependencies
+      - run: npx nx --version  # Verifies that Nx is installed
+      - run: npx nx run task-management:build  # Build the specific task-management project
 
   deploy:
     runs-on: ubuntu-latest
@@ -28,5 +28,5 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TASK_BUDDY_FED16 }}
-          channelId: live
-          projectId: task-buddy-fed16
+          channelId: live  # Adjust if you want a different channel for previews
+          projectId: task-buddy-fed16  # Your Firebase project ID
