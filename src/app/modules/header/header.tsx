@@ -16,7 +16,7 @@ export function Header() {
 
 
   const updateViewType = useCallback((viewType: TaskView) => {
-    // dispatch(taskViewActions.setViewType(viewType));
+    dispatch(taskViewActions.setViewType(viewType));
   }, [])
 
   const logout = useCallback(() => {

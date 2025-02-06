@@ -1,4 +1,3 @@
-import { MenuButtonModifiers, RenderProp } from "@szhsin/react-menu";
 import React from "react";
 import { Icons } from "../enums/icons.enum";
 
@@ -16,4 +15,5 @@ export interface MenuProps<T> {
     id: string;
     children: React.ReactNode;
     align: "center" | "end" | "start";
+    secondary?: boolean;
 }

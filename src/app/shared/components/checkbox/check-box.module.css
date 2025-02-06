@@ -1,0 +1,25 @@
+.checkbox {
+    appearance: none;
+    min-width: 15px;
+    min-height: 15px;
+    max-width: 15px;
+    max-height: 15px;
+    border: 2px solid var(--border-muted);
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    place-content: center;
+    place-items: center;
+    font-size: var(--font-size-xxxs);
+    border-radius: 4px;
+}
+
+.checkbox:checked {
+    background-color: var(--background-primary-dark);
+    border-color: var(--background-primary-dark);
+    color: var(--background-secondary-light);
+}
+
+.checkbox:checked::after {
+    content: '\2714';
+}

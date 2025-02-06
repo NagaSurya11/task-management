@@ -2,6 +2,8 @@
     display: flex;
     place-items: center;
     justify-content: space-between;
+    height: 48px;
+    margin-bottom: 1rem;
 }
 
 .filter_container_cd {
@@ -58,4 +60,11 @@
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-xxs);
     color: var(--text-dark);
+}
+
+.filter_container_cd_root {
+    display: flex;
+    flex-direction: column;
+    justify-items: flex-start;
+    height: 100%;
 }

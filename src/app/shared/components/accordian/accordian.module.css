@@ -1,0 +1,118 @@
+/* reset */
+/* button,
+h3 {
+    all: unset;
+} */
+
+.accordian_root {
+    border-radius: 12px;
+    width: 100%;
+}
+
+
+.accordian_root__item {
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.accordian_root__item:focus-within {
+    position: relative;
+    z-index: 1;
+}
+
+.accordian_root__item__header {
+    display: flex;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.accordian_root__item__header:hover {
+    opacity: 0.8;
+}
+
+.accordian_root__item__header__trigger {
+    padding: 0 1rem;
+    height: 46px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    border: none;
+    outline: none;
+}
+
+.accordian_root__item__header__trigger.TO-DO {
+    background-color: var(--background-primary);
+}
+
+.accordian_root__item__header__trigger.IN-PROGRESS {
+    background: var(--background-secondary-dark);
+}
+
+.accordian_root__item__header__trigger.COMPLETED {
+    background: var(--background-tertiary);
+}
+
+
+.accordian_root__item__content {
+    overflow-y: auto;
+    min-height: 200px;
+    max-height: 331px;
+    background-color: var(--background-secondary);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+
+
+.accordian_root__item__content[data-state="open"] {
+    animation: slideDown 100ms ease cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.accordian_root__item__content[data-state="closed"] {
+    animation: slideUp 100ms ease cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.accordian_root__item__header__trigger__chevon {
+    transition: transform 100ms ease cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.accordian_root__item__header__trigger[data-state="open"]>.accordian_root__item__header__trigger__chevon {
+    transform: rotate(180deg);
+}
+
+.accordian_root__item__content__children {
+    min-height: 200px;
+    max-height: 330px;
+    display: flex;
+    flex-direction: column;
+}
+
+.accordian_root__item__content__children>div {
+    margin: 0px !important;
+}
+
+
+@keyframes slideDown {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: fit-content;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        height: fit-content;
+    }
+
+    to {
+        height: 0;
+    }
+}

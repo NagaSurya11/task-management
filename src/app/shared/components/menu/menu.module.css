@@ -33,3 +33,7 @@
     background: var(--background-muted);
     outline: unset;
 }
+
+.menu.secondary {
+    background: var(--background-secondary-light);
+}

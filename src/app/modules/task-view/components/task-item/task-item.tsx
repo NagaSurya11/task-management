@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
+  dateToActivityEventDisplayFormat,
   Icons,
   MenuOptions,
   MenuProps,
@@ -12,10 +13,11 @@ import {
 import styles from './task-item.module.css';
 import Icon from 'src/app/shared/components/icon/icon';
 import Menu from 'src/app/shared/components/menu/menu';
-import { clone } from 'lodash';
+import { clone, cloneDeep, isEqual } from 'lodash';
 import { useDispatch } from 'react-redux';
-import { deleteTask, taskViewActions } from 'src/app/shared/store/task-view/task-view.slice';
+import { deleteTask, editTask, taskViewActions } from 'src/app/shared/store/task-view/task-view.slice';
 import { AppDispatch } from 'src/main';
+import Checkbox from 'src/app/shared/components/checkbox/check-box';
 
 export interface TaskItemProps {
   task: Task;
@@ -24,8 +26,8 @@ export interface TaskItemProps {
 }
 
 export enum TaskMenuActions {
-    EDIT = 'edit',
-    DELETE = 'delete'
+  EDIT = 'edit',
+  DELETE = 'delete'
 }
 
 export const TaskContextMenuItems: MenuOptions<TaskMenuActions> = [
@@ -33,10 +35,9 @@ export const TaskContextMenuItems: MenuOptions<TaskMenuActions> = [
   { label: 'Delete', value: TaskMenuActions.DELETE, warn: true, icon: Icons.DELETE_SHARP },
 ];
 
-const BoardTaskItem: React.FC<Task> = (props) => {
-  const { name, id, dueOn, status, category } = props;
-
+const CategoryContextMenuComponent: React.FC<Task> = (props) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { id, status } = props;
 
   const onMenuAction = (id: string, action: TaskMenuActions) => {
     switch (action) {
@@ -44,7 +45,7 @@ const BoardTaskItem: React.FC<Task> = (props) => {
         dispatch(taskViewActions.openEditTaskDialog(props))
         break;
       case TaskMenuActions.DELETE:
-        dispatch(deleteTask({taskId: id, taskStatus: status}));
+        dispatch(deleteTask({ taskId: id, taskStatus: status }));
         break;
       default:
         break;
@@ -52,31 +53,38 @@ const BoardTaskItem: React.FC<Task> = (props) => {
   };
 
   return (
+    <Menu
+      onClick={(value) => onMenuAction(id, value)}
+      options={clone(TaskContextMenuItems)}
+      id={id as string}
+      key={id as string}
+      align="end"
+    >
+      <div>
+        <Icon
+          className={styles['board_task_item__context_menu_icon']}
+          icon={Icons.ELLIPSIS_OUTLINE}
+          height={16}
+          width={16}
+        />
+      </div>
+    </Menu>
+  );
+
+}
+
+const BoardTaskItem: React.FC<Task> = (props) => {
+  const { name, id, dueOn, status, category } = props;
+  return (
     <div className={styles['board_task_item']}>
       <div className={styles['board_task_item__header']}>
         <div
-          className={`${styles['board_task_item__name']} ${
-            status === TaskStatus.COMPLETED ? styles['completed'] : ''
-          }`}
+          className={`${styles['board_task_item__name']} ${status === TaskStatus.COMPLETED ? styles['completed'] : ''
+            }`}
         >
           {name}
         </div>
-        <Menu
-          onClick={(value) => onMenuAction(id, value)}
-          options={clone(TaskContextMenuItems)}
-          id={id as string}
-          key={id as string}
-          align="end"
-        >
-          <div>
-            <Icon
-              className={styles['board_task_item__context_menu_icon']}
-              icon={Icons.ELLIPSIS_OUTLINE}
-              height={16}
-              width={16}
-            />
-          </div>
-        </Menu>
+        <CategoryContextMenuComponent {...props} />
       </div>
       <div className={styles['board_task_item__footer']}>
         <div className={styles['board_task_item__category']}>{category}</div>
@@ -87,6 +95,67 @@ const BoardTaskItem: React.FC<Task> = (props) => {
     </div>
   );
 };
+
+export const TaskStatusMenuOptions: MenuOptions<TaskStatus> = [
+  {
+    label: TaskStatus.TODO,
+    value: TaskStatus.TODO
+  },
+  {
+    label: TaskStatus.IN_PROGRESS,
+    value: TaskStatus.IN_PROGRESS
+  },
+  {
+    label: TaskStatus.COMPLETED,
+    value: TaskStatus.COMPLETED
+  }
+]
+
+const ListTaskItem: React.FC<Task> = (props) => {
+
+  const { category, dueOn, id, name, status, activity } = props;
+  const [checked, setChecked] = useState(false);
+  const changeChecked = () => setChecked(!checked);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const statusIcon = useMemo(() => isEqual(status, TaskStatus.COMPLETED) ? Icons.CHECKED_CIRCLE_SHARP : Icons.UN_CHECKED_CIRCLE_SHARP, [status]);
+
+  const handleTaskStatusChange = useCallback((option: TaskStatus) => {
+    if (!isEqual(option, status)) {
+      const newActivity = cloneDeep(activity) ?? [];
+      newActivity.push({
+        date: dateToActivityEventDisplayFormat(new Date()),
+        name: `You changed status from ${String(status).toLowerCase().replace('-', ' ')} to ${String(option).toLowerCase().replace('-', ' ')}`
+      })
+      dispatch(editTask({ isSilentUpdate: true, changeOrder: true, previousStatus: status, task: { ...props, status: option, activity: newActivity } }));
+    }
+  }, [status]);
+
+  const isCompleted = useMemo(() => isEqual(status, TaskStatus.COMPLETED) ? 'completed' : '', []);
+
+  return (
+    <div className={styles['task_list_item']}>
+      <div className={`${styles['task_list_item__name']} ${styles[isCompleted]}`}>
+        <Checkbox id={id} checked={checked} onClick={changeChecked} />
+        <Icon icon={Icons.DRAG_OUTLINE} height={15} width={21} />
+        <Icon icon={statusIcon} height={20} width={20} />
+        {name}
+      </div>
+      <div className={styles["task_list_item__dueOn"]}>{dueOn}</div>
+      <div className={styles["task_list_item__status"]}>
+        <Menu id='task_list_item__status' align='center' options={clone(TaskStatusMenuOptions)} onClick={handleTaskStatusChange} secondary>
+          <div className={styles['task_list_item__status__btn']}>{status}</div>
+        </Menu>
+      </div>
+
+      <div className={styles["task_list_item__category"]}>
+        {category}
+        <CategoryContextMenuComponent {...props} />
+      </div>
+    </div>
+  )
+}
 
 const TaskItem: React.FC<TaskItemProps> = (props) => {
   const { task, viewType } = props;
@@ -101,7 +170,9 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {viewType === TaskView.BOARD ? <BoardTaskItem {...task} /> : null}
+      {viewType === TaskView.BOARD ? <BoardTaskItem {...task} /> :
+
+        <ListTaskItem {...task} />}
     </div>
   );
 };

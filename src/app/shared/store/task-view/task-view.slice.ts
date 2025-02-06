@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Attachment, base64ToFile, Category, dateToActivityEventDisplayFormat, EncodedFile, fileToBase64, IResponse, ResponseMessage, Task, TaskStatus, TaskView } from '../../types';
+import { Attachment, base64ToFile, Category, dateToActivityEventDisplayFormat, EncodedFile, fileToBase64, IResponse, ResponseMessage, Sort, SortType, Task, TaskColumn, TaskStatus, TaskView } from '../../types';
 import { TaskData } from 'src/app/modules/task-view/task-view';
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep, isEqual, sortBy } from 'lodash';
 import { auth, db } from 'src/app/modules/auth/auth.config';
 import { collection, addDoc, serverTimestamp, doc, setDoc, getDocs, deleteDoc, writeBatch } from "firebase/firestore";
 
@@ -28,11 +28,12 @@ export interface TaskViewState {
     task: Task;
     attachments?: EncodedFile[];
     isFetchingAttachments?: boolean;
-  }
+  };
+  sort?: Sort;
 }
 
 export const initialTaskViewState: TaskViewState = {
-  viewType: TaskView.BOARD, // Default view type
+  viewType: TaskView.LIST, // Default view type
   taskData: [
     { id: TaskStatus.TODO, tasks: [] },
     { id: TaskStatus.IN_PROGRESS, tasks: [] },
@@ -140,7 +141,7 @@ export const createTask = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/addTask`, (
   })
 });
 
-export const editTask = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/editTask`, (editTaskInput: { task: Task, isSilentUpdate?: boolean, previousStatus?: TaskStatus }) => {
+export const editTask = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/editTask`, (editTaskInput: { task: Task, isSilentUpdate?: boolean, previousStatus?: TaskStatus, changeOrder?: boolean }) => {
   return new Promise<IResponse>(async resolve => {
     try {
       const user = auth.currentUser;
@@ -252,6 +253,9 @@ export const taskViewSlice = createSlice({
     },
     closeEditTaskDialog: (state) => {
       state.editTaskDialogState = undefined;
+    },
+    setSort: (state, action: PayloadAction<Sort>) => {
+      state.sort = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -308,8 +312,8 @@ export const taskViewSlice = createSlice({
       };
     });
     builder.addCase(editTask.fulfilled, (state, action) => {
-      const { previousStatus, task, isSilentUpdate } = action.meta.arg;
-      if (isSilentUpdate) {
+      const { previousStatus, task, isSilentUpdate, changeOrder } = action.meta.arg;
+      if (isSilentUpdate && !changeOrder) {
         return;
       }
       if (action.payload.status) {
@@ -376,16 +380,39 @@ export const selectTaskDueDate = (state: { taskView: TaskViewState }) =>
   state.taskView.date;
 
 export const selectFilteredTaskData = (state: { taskView: TaskViewState }) => {
-  const { taskData, searchTerm, category, date } = state.taskView;
+  const { taskData, searchTerm, category, date, sort } = state.taskView;
 
-  return taskData.map(container => ({
-    ...container,
-    tasks: container.tasks.filter(task =>
+  return taskData.map(container => {
+    let tasks = container.tasks.filter(task =>
       (!searchTerm || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
       && (!category || isEqual(task.category, category))
       && (!date || isEqual(task.dueOn, date))
-    )
-  }));
+    );
+
+    if (sort) {
+      switch (sort.column) {
+        case TaskColumn.name:
+          tasks = sortBy(tasks, 'name');
+          break;
+        case TaskColumn.dueOn:
+          tasks = sortBy(tasks, 'dueOn');
+          break;
+        case TaskColumn.status:
+          tasks = sortBy(tasks, 'status');
+          break;
+        case TaskColumn.category:
+          tasks = sortBy(tasks, 'category');
+          break;
+      }
+      if (isEqual(sort.type, SortType.DESC)) {
+        tasks.reverse();
+      }
+    }
+    return {
+      ...container,
+      tasks
+    }
+  });
 }
 
 export const selectTaskData = (state: { taskView: TaskViewState }) =>
@@ -402,3 +429,6 @@ export const selectCreateTaskDialogState = (state: { taskView: TaskViewState }) 
 
 export const selectEditTaskDialogState = (state: { taskView: TaskViewState }) =>
   state.taskView.editTaskDialogState;
+
+export const selectSort = (state: { taskView: TaskViewState }) =>
+  state.taskView.sort;

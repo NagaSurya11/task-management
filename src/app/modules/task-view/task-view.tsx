@@ -1,17 +1,17 @@
 import styles from './task-view.module.css';
 import Filter from './components/filter/filter';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTasks, selectFilteredTaskData, selectTaskViewIsLoading, selectSearchTerm, selectTaskData, selectTaskViewType, taskViewActions, editTask, selectTaskCategory } from 'src/app/shared/store/task-view/task-view.slice';
+import { fetchTasks, selectFilteredTaskData, selectTaskViewIsLoading, selectSearchTerm, selectTaskData, selectTaskViewType, taskViewActions, editTask, selectTaskCategory, selectSort } from 'src/app/shared/store/task-view/task-view.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Category, dateToActivityEventDisplayFormat, Task, TaskStatus } from 'src/app/shared/types';
-import { closestCenter, DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, getFirstCollision, PointerSensor, pointerWithin, rectIntersection, TouchSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
+import { Category, dateToActivityEventDisplayFormat, Task, TaskStatus, TaskView as ETaskView, TaskColumn, SortType, Icons } from 'src/app/shared/types';
+import { closestCenter, closestCorners, DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, getFirstCollision, PointerSensor, pointerWithin, rectIntersection, TouchSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { TaskContainer } from './components/container/container';
 import TaskItem from './components/task-item/task-item';
 import { AppDispatch } from 'src/main';
 import { cloneDeep, isEqual } from 'lodash';
 import { EditTaskDialog } from './components/edit-task/edit-task-dialog';
-
+import Icon from 'src/app/shared/components/icon/icon';
 
 export type TaskData = {
   id: TaskStatus;
@@ -26,7 +26,7 @@ export function TaskView() {
   const dispatch = useDispatch<AppDispatch>();
   const searchTerm = useSelector(selectSearchTerm);
   const isLoading = useSelector(selectTaskViewIsLoading);
-  const category = useSelector(selectTaskCategory);
+  const sort = useSelector(selectSort);
 
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const recentlyMovedToNewContainer = useRef(false);
@@ -186,7 +186,7 @@ export function TaskView() {
             date: dateToActivityEventDisplayFormat(new Date()),
             name: `You changed status from ${String(previousStatus).toLowerCase().replace('-', ' ')} to ${String(currentStatus).toLowerCase().replace('-', ' ')}`
           });
-          dispatch(editTask({task, previousStatus, isSilentUpdate: true}));
+          dispatch(editTask({ task, previousStatus, isSilentUpdate: true }));
         }
       }
     }
@@ -218,26 +218,71 @@ export function TaskView() {
     return (!!searchTerm && searchTerm.length === 0) || filteredTaskData.filter(data => data.tasks.length > 0).length > 0;
   }, [isLoading, searchTerm, filteredTaskData])
 
+  const handleSortChange = useCallback((column: TaskColumn) => {
+    dispatch(taskViewActions.setSort({
+      column,
+      type: isEqual(sort, { column, type: SortType.ASC }) ? SortType.DESC : SortType.ASC
+    }))
+  }, [sort]);
+
+
+  const isSortActive = useCallback((column: TaskColumn) => isEqual(column, sort?.column) ? 'active' : '', [sort?.column]);
+  const ascending = useCallback((column: TaskColumn) => isEqual(column, sort?.column) && isEqual(sort?.type, SortType.ASC) ? 'active' : '', [sort]);
+  const descending = useCallback((column: TaskColumn) => isEqual(column, sort?.column) && isEqual(sort?.type, SortType.DESC) ? 'active' : '', [sort]);
+
+  const collisionStratergy = useMemo(() => isEqual(taskViewType, ETaskView.LIST) ? closestCorners : closestCenter, [taskViewType]);
+
+  const TaskContainerList = () => {
+    return (
+      <>
+        {
+          filteredTaskData.map((container) => (
+            <TaskContainer
+              key={container.id}
+              id={container.id}
+              tasks={container.tasks}
+              viewtype={taskViewType}
+            />
+          ))
+        }
+      </>
+    )
+  };
+
   return (
     <div className={styles['task-view']}>
       <Filter />
       {isFilteredTaskItemsAvailable ?
-        <div className={styles['task-view-container']}>
+        <div className={`${styles['task-view-container']} ${styles[taskViewType]}`}>
+          {taskViewType === ETaskView.LIST &&
+            <div className='task-header-row'>
+              <div className={styles['divider']}></div>
+              <div className={styles['sort_header']}>
+                {Object.values(TaskColumn).map(value => (
+                  <div className={styles['sort_header__column']} key={value} onClick={() => handleSortChange(value)}>
+                    <div className={styles['sort_header__column__name']}>{value}</div>
+                    <div className={`${styles['sort_header__column__icon_container']} ${styles[isSortActive(value)]}`}>
+                      <Icon icon={Icons.POLYGON_SHARP} width={8} height={4} className={`${styles['sort_header__column__icon_container__polygon_a']} ${styles[ascending(value)]}`}></Icon>
+                      <Icon icon={Icons.POLYGON_SHARP} width={8} height={4} className={`${styles['sort_header__column__icon_container__polygon_b']} ${styles[descending(value)]}`}></Icon>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCenter}
+            collisionDetection={collisionStratergy}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            {filteredTaskData.map((container) => (
-              <TaskContainer
-                key={container.id}
-                id={container.id}
-                tasks={container.tasks}
-                viewtype={taskViewType}
-              />
-            ))}
+            {isEqual(taskViewType, ETaskView.LIST) ?
+              <div className={styles["task_container_list_view"]}>
+                <TaskContainerList />
+              </div>
+              :
+              <TaskContainerList />}
             <DragOverlay><TaskItem task={findTaskById(activeId)} viewType={taskViewType} /></DragOverlay>
           </DndContext>
         </div>

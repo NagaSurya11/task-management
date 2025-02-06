@@ -15,9 +15,21 @@
 .task-view-container {
     display: flex;
     flex-direction: row;
-    place-content: center;
     width: 100%;
     height: 95%;
+}
+
+.task-view-container.LIST {
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.task_container_list_view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 .5rem;
+    overflow-y: auto;
 }
 
 .no_task_image_container {
@@ -25,4 +37,61 @@
     place-content: center;
     place-items: center;
     height: 100%;
+}
+
+.divider {
+    width: 100%;
+    display: flex;
+    border: 1px solid var(--border-dark);
+    margin-bottom: .5rem;
+}
+
+.sort_header {
+    display: grid;
+    grid-template-columns: 30% 20% 20% 30%;
+    padding: 0 .5rem;
+}
+
+.sort_header__column {
+    display: flex;
+    place-items: center;
+    gap: .3rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sort_header__column__name {
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+}
+
+.sort_header__column__icon_container {
+    display: none;
+    flex-direction: column;
+    height: 10px;
+    place-content: center;
+    place-items: center;
+    gap: .1rem;
+}
+
+.sort_header__column:hover>.sort_header__column__icon_container,
+.sort_header__column__icon_container.active {
+    display: flex;
+}
+
+
+
+.sort_header__column__icon_container__polygon_a,
+.sort_header__column__icon_container__polygon_b {
+    opacity: 0.6;
+}
+
+.sort_header__column__icon_container__polygon_b {
+    rotate: 180deg;
+}
+
+.sort_header__column__icon_container__polygon_a.active,
+.sort_header__column__icon_container__polygon_b.active {
+    opacity: 1;
 }

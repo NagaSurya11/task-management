@@ -1,16 +1,21 @@
 export enum Icons {
     BOARD_OUTLINE = 'board_outline',
     CALENDER_SHARP = 'calender_sharp',
+    CHECK_MARK_SHARP = 'check_mark_sharp',
+    CHECKED_CIRCLE_SHARP = 'checked_circle_sharp',
     CHEVRON_DOWN_OUTLINE = 'chevron_down_outline',
     CLOSE_OUTLINE = 'close_outline',
     DELETE_SHARP = 'delete_sharp',
+    DRAG_OUTLINE = 'drag_outline',
     EDIT_SHARP = 'edit_sharp',
     ELLIPSIS_OUTLINE = 'ellipsis_outline',
     GOOGLE_SHARP = 'google_sharp',
     LIST_OUTLINE = 'list_outline',
     LOGOUT_OUTLINE = 'logout_outline',
+    POLYGON_SHARP = 'polygon_sharp',
     SEARCH_OUTLINE = 'search_outline',
     TASK_LIST_OUTLINE = 'task_list_outline',
     TASK_OUTLINE = 'task_outline',
-    TASK_SHARP = 'task_sharp'
+    TASK_SHARP = 'task_sharp',
+    UN_CHECKED_CIRCLE_SHARP= 'unchecked_circle_sharp'
 }

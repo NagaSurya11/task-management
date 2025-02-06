@@ -60,19 +60,21 @@ export function Filter() {
 
   return (
     <div className={styles['filter_container']}>
-      <div className={styles['filter_container_cd']}>
-        Filter by :
-        <Menu id='category-filter' key={'category-filter'} align='center' onClick={(value: Category) => updateCategory(value)} options={Categories}>
-          <div className={`${styles['filter_container_select_btn']} ${!!category ? styles['active'] : ''}`}>
-            {!!category ? category : 'Category'}
+      <div className={styles['filter_container_cd_root']}>
+        <div className={styles['filter_container_cd']}>
+          Filter by :
+          <Menu id='category-filter' key={'category-filter'} align='center' onClick={(value: Category) => updateCategory(value)} options={Categories}>
+            <div className={`${styles['filter_container_select_btn']} ${!!category ? styles['active'] : ''}`}>
+              {!!category ? category : 'Category'}
+              <Icon icon={Icons.CHEVRON_DOWN_OUTLINE} height={18} width={18} />
+            </div>
+          </Menu>
+          <CustomDatePicker selected={dueDate ?? new Date().toDateString()} onChange={(date) => updateDueDate(date)} open={datePickerState} container={<div className={`${styles['filter_container_select_btn']} ${!!dueDate ? styles['active'] : ''}`}
+            onClick={() => changeDatePickerState(true)}>
+            {!!dueDate ? dueDate.substring(4) : 'Due Date'}
             <Icon icon={Icons.CHEVRON_DOWN_OUTLINE} height={18} width={18} />
-          </div>
-        </Menu>
-        <CustomDatePicker selected={dueDate ?? new Date().toDateString()} onChange={(date) => updateDueDate(date)} open={datePickerState} container={<div className={`${styles['filter_container_select_btn']} ${!!dueDate ? styles['active'] : ''}`}
-          onClick={() => changeDatePickerState(true)}>
-          {!!dueDate ? dueDate.substring(4) : 'Due Date'}
-          <Icon icon={Icons.CHEVRON_DOWN_OUTLINE} height={18} width={18} />
-        </div>} />
+          </div>} />
+        </div>
       </div>
       <div className={styles['filter_container_sa']}>
         <div className={styles['filter_container__search_container']}>
