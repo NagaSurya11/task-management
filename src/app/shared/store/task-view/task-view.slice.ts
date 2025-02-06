@@ -288,6 +288,9 @@ export const taskViewSlice = createSlice({
   reducers: {
     setViewType: (state, action: PayloadAction<TaskView>) => {
       state.viewType = action.payload;
+      if (isEqual(action.payload, TaskView.BOARD)) {
+        state.selected = {ids: {}, size: 0};
+      }
     },
     setCategory: (state, action: PayloadAction<Category>) => {
       state.category = action.payload;
