@@ -5,6 +5,7 @@ import { AppDispatch } from "src/main";
 import styles from './auth.module.css';
 import Icon from "src/app/shared/components/icon/icon";
 import { Icons } from "src/app/shared/types";
+import { Loader } from "src/app/shared/components/loader/loader";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = (props) => {
 
@@ -21,7 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = (props) => {
         dispatch(initAuth());
     }, [])
     if (isLoading) {
-        return <>Loading...</>
+        return <Loader showLoader />
     } else {
         return (
             <>
