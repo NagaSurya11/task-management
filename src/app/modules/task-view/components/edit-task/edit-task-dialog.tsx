@@ -99,7 +99,6 @@ export const EditTaskDialog: React.FC = () => {
 
     useEffect(() => {
         const task = dialogState?.task;
-        console.log('task', task);
         if (task) {
             dispatch(fetchAttachments({ taskId: task.id }))
         }
