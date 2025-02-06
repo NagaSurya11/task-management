@@ -2,9 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Attachment, base64ToFile, Category, dateToActivityEventDisplayFormat, EncodedFile, fileToBase64, IResponse, ResponseMessage, Sort, SortType, Task, TaskColumn, TaskStatus, TaskView } from '../../types';
 import { TaskData } from 'src/app/modules/task-view/task-view';
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { cloneDeep, isEqual, sortBy } from 'lodash';
+import { clone, cloneDeep, isEqual, sortBy } from 'lodash';
 import { auth, db } from 'src/app/modules/auth/auth.config';
-import { collection, addDoc, serverTimestamp, doc, setDoc, getDocs, deleteDoc, writeBatch } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, setDoc, getDocs, deleteDoc, writeBatch, arrayUnion, updateDoc } from "firebase/firestore";
 
 export const TASK_VIEW_FEATURE_KEY = 'taskView';
 
@@ -30,16 +30,27 @@ export interface TaskViewState {
     isFetchingAttachments?: boolean;
   };
   sort?: Sort;
+  selected: {
+    ids: Record<string, boolean>,
+    size: number
+  };
+  isUpdating?: boolean;
 }
+
+const initialTaskData = [
+  { id: TaskStatus.TODO, tasks: [] },
+  { id: TaskStatus.IN_PROGRESS, tasks: [] },
+  { id: TaskStatus.COMPLETED, tasks: [] }
+];
 
 export const initialTaskViewState: TaskViewState = {
   viewType: TaskView.LIST, // Default view type
-  taskData: [
-    { id: TaskStatus.TODO, tasks: [] },
-    { id: TaskStatus.IN_PROGRESS, tasks: [] },
-    { id: TaskStatus.COMPLETED, tasks: [] }
-  ],
-  isLoading: true
+  taskData: cloneDeep(initialTaskData),
+  isLoading: true,
+  selected: {
+    ids: {},
+    size: 0
+  }
 };
 
 export const fetchTasks = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/fetchTasks`, () => {
@@ -211,7 +222,63 @@ export const fetchAttachments = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/fetch
       resolve({ status: false, value: [], error: ResponseMessage.INTERNAL_SERVER_ERROR });
     }
   });
-})
+});
+
+export const deleteMultipleTasks = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/deleteMultipleTasks`, (_, { getState, dispatch }) => {
+  return new Promise<IResponse>(async resolve => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        resolve({ status: false, error: ResponseMessage.NOT_AUTHENTICATED });
+        return;
+      }
+      const selected = (getState() as { taskView: TaskViewState }).taskView.selected.ids;
+      const queryRef = collection(db, 'users', user.uid, 'tasks');
+      const batch = writeBatch(db);
+      for (const taskId of Object.keys(selected)) {
+        const taskDocument = doc(queryRef, taskId);
+        batch.delete(taskDocument);
+      }
+      await batch.commit();
+      dispatch(fetchTasks());
+      resolve({ status: true });
+    } catch (error) {
+      console.error(error);
+      resolve({ status: false, error: ResponseMessage.INTERNAL_SERVER_ERROR });
+    }
+  })
+});
+
+export const updateMultipleTaskStatus = createAsyncThunk(`${TASK_VIEW_FEATURE_KEY}/updateMultipleTaskStatus`, ({ status }: { status: TaskStatus }, { getState, dispatch }) => {
+  return new Promise<IResponse>(async resolve => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        resolve({ status: false, error: ResponseMessage.NOT_AUTHENTICATED });
+        return;
+      }
+      const selected = (getState() as { taskView: TaskViewState }).taskView.selected.ids;
+      const queryRef = collection(db, 'users', user.uid, 'tasks');
+      const batch = writeBatch(db);
+      for (const taskId of Object.keys(selected)) {
+        const taskDocument = doc(queryRef, taskId);
+        batch.update(taskDocument, {
+          status,
+          activity: arrayUnion({
+            date: dateToActivityEventDisplayFormat(new Date()),
+            name: `You changed status to ${String(status).toLowerCase().replace('-', ' ')}`
+          })
+        });
+      }
+      await batch.commit();
+      dispatch(fetchTasks());
+      resolve({ status: true });
+    } catch (error) {
+      console.error(error);
+      resolve({ status: false, error: ResponseMessage.INTERNAL_SERVER_ERROR });
+    }
+  })
+});
 
 
 
@@ -256,12 +323,41 @@ export const taskViewSlice = createSlice({
     },
     setSort: (state, action: PayloadAction<Sort>) => {
       state.sort = action.payload;
+    },
+    selectOrDeselectTask: (state, action: PayloadAction<string>) => {
+      if (state.selected.ids[action.payload]) {
+        delete state.selected.ids[action.payload];
+        state.selected.size--;
+      } else {
+        state.selected.ids[action.payload] = true;
+        state.selected.size++;
+      }
+    },
+    selectAllTask: (state) => {
+      const selected: { ids: Record<string, boolean>, size: number } = {
+        ids: {},
+        size: 0
+      };
+      state.taskData
+        .forEach(({ tasks }) =>
+          tasks.forEach(task => {
+            selected.ids[task.id] = true;
+            selected.size++;
+          }));
+      state.selected = selected;
+    },
+    deSelectAllTask: (state) => {
+      state.selected = {
+        ids: {},
+        size: 0
+      }
     }
   },
   extraReducers: (builder) => {
     // Add extra reducers here
     builder.addCase(fetchTasks.pending, (state) => {
       state.isLoading = true;
+      state.taskData = cloneDeep(initialTaskData);
     });
     builder.addCase(fetchTasks.fulfilled, (state, action) => {
       state.isLoading = false;
@@ -273,7 +369,9 @@ export const taskViewSlice = createSlice({
       state.isLoading = false;
       state.errors = action.error.message ?? 'An error occurred';
     });
-
+    builder.addCase(deleteTask.pending, (state) => {
+      state.isUpdating = true;
+    })
     builder.addCase(deleteTask.fulfilled, (state, action) => {
       const { taskId, taskStatus } = action.meta.arg;
       if (action.payload.status) {
@@ -283,6 +381,7 @@ export const taskViewSlice = createSlice({
         taskData[overIndex].tasks.splice(taskIndex, 1);
         state.taskData = taskData;
       }
+      state.isUpdating = false;
     });
     builder.addCase(createTask.fulfilled, (state, action) => {
       if (action.payload.status) {
@@ -304,14 +403,17 @@ export const taskViewSlice = createSlice({
           isLoading: false
         };
       }
+      state.isUpdating = false;
     });
     builder.addCase(createTask.pending, (state) => {
       state.createTaskDialogState = {
         open: true,
         isLoading: true
       };
+      state.isUpdating = true;
     });
     builder.addCase(editTask.fulfilled, (state, action) => {
+      state.isUpdating = false;
       const { previousStatus, task, isSilentUpdate, changeOrder } = action.meta.arg;
       if (isSilentUpdate && !changeOrder) {
         return;
@@ -347,11 +449,13 @@ export const taskViewSlice = createSlice({
       if (state.editTaskDialogState) {
         state.editTaskDialogState.isLoading = true;
       }
+      state.isUpdating = true;
     });
     builder.addCase(fetchAttachments.pending, (state) => {
       if (state.editTaskDialogState) {
         state.editTaskDialogState.isFetchingAttachments = true;
       }
+      state.isUpdating = true;
     })
     builder.addCase(fetchAttachments.fulfilled, (state, action) => {
       const { status, value } = action.payload;
@@ -361,7 +465,22 @@ export const taskViewSlice = createSlice({
           state.editTaskDialogState.isFetchingAttachments = false;
         }
       }
+      state.isUpdating = false;
     });
+
+    builder.addCase(deleteMultipleTasks.pending, (state) => {
+      state.isUpdating = true;
+    });
+    builder.addCase(deleteMultipleTasks.fulfilled, (state) => {
+      state.isUpdating = false;
+      state.selected = { ids: {}, size: 0 };
+    });
+    builder.addCase(updateMultipleTaskStatus.pending, (state) => {
+      state.isUpdating = true;
+    });
+    builder.addCase(updateMultipleTaskStatus.fulfilled, (state) => {
+      state.isUpdating = false;
+    })
   }
 });
 
@@ -432,3 +551,10 @@ export const selectEditTaskDialogState = (state: { taskView: TaskViewState }) =>
 
 export const selectSort = (state: { taskView: TaskViewState }) =>
   state.taskView.sort;
+
+export const selectSelectedTasks = (state: { taskView: TaskViewState }) =>
+  state.taskView.selected;
+
+
+export const selectCanShowLoader = (state: { taskView: TaskViewState }) =>
+  state.taskView.isUpdating;

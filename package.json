@@ -23,6 +23,7 @@
     "@reduxjs/toolkit": "1.9.3",
     "@types/lodash": "^4.17.15",
     "firebase": "^11.2.0",
+    "framer-motion": "^12.4.0",
     "lodash": "^4.17.21",
     "quill": "^2.0.3",
     "react": "19.0.0",

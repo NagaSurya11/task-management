@@ -1,7 +1,7 @@
 import styles from './task-view.module.css';
 import Filter from './components/filter/filter';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTasks, selectFilteredTaskData, selectTaskViewIsLoading, selectSearchTerm, selectTaskData, selectTaskViewType, taskViewActions, editTask, selectTaskCategory, selectSort } from 'src/app/shared/store/task-view/task-view.slice';
+import { fetchTasks, selectFilteredTaskData, selectTaskViewIsLoading, selectSearchTerm, selectTaskData, selectTaskViewType, taskViewActions, editTask, selectTaskCategory, selectSort, selectSelectedTasks, deleteMultipleTasks, updateMultipleTaskStatus } from 'src/app/shared/store/task-view/task-view.slice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Category, dateToActivityEventDisplayFormat, Task, TaskStatus, TaskView as ETaskView, TaskColumn, SortType, Icons } from 'src/app/shared/types';
 import { closestCenter, closestCorners, DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, getFirstCollision, PointerSensor, pointerWithin, rectIntersection, TouchSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
@@ -9,9 +9,12 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { TaskContainer } from './components/container/container';
 import TaskItem from './components/task-item/task-item';
 import { AppDispatch } from 'src/main';
-import { cloneDeep, isEqual } from 'lodash';
+import { clone, cloneDeep, isEqual } from 'lodash';
 import { EditTaskDialog } from './components/edit-task/edit-task-dialog';
 import Icon from 'src/app/shared/components/icon/icon';
+import { motion } from "framer-motion";
+import Menu from 'src/app/shared/components/menu/menu';
+import { TaskStatusMenuOptions } from 'src/app/shared/types/constants/task-status-menu-options';
 
 export type TaskData = {
   id: TaskStatus;
@@ -27,6 +30,7 @@ export function TaskView() {
   const searchTerm = useSelector(selectSearchTerm);
   const isLoading = useSelector(selectTaskViewIsLoading);
   const sort = useSelector(selectSort);
+  const selectedTasks = useSelector(selectSelectedTasks);
 
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const recentlyMovedToNewContainer = useRef(false);
@@ -249,6 +253,11 @@ export function TaskView() {
     )
   };
 
+  const handleSelectAll = useCallback(() => dispatch(taskViewActions.selectAllTask()), [taskData]);
+  const handleDeSelectAll = useCallback(() => dispatch(taskViewActions.deSelectAllTask()), [taskData]);
+  const handleDeleteSelected = useCallback(() => dispatch(deleteMultipleTasks()), [taskData]);
+  const handleUpdateSelected = useCallback((status: TaskStatus) => dispatch(updateMultipleTaskStatus({status})), [taskData]);
+
   return (
     <div className={styles['task-view']}>
       <Filter />
@@ -292,6 +301,28 @@ export function TaskView() {
         </div>
       }
       <EditTaskDialog />
+      {selectedTasks.size > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          className={styles['motion_div']}
+        >
+          <div className={styles["motion_div_sub1"]}>
+          <div className={styles["selected_container"]}>
+            {selectedTasks.size} Tasks Selected
+            <Icon onClick={handleDeSelectAll} icon={Icons.CLOSE_SHARP} width={15} height={15}></Icon>
+          </div>
+          <Icon onClick={handleSelectAll} className={styles['select_all']} icon={Icons.SELECT_ALL_OUTLINE} width={16} height={16}></Icon>
+          </div>
+          <div className={styles["motion_div_sub2"]}>
+            <Menu id='motion_div_sub2__status' onClick={handleUpdateSelected} options={cloneDeep(TaskStatusMenuOptions)} align='center' type='tertiary'>
+            <div className={styles["motion_div_sub2__status"]}>Status</div>
+            </Menu>
+            <div onClick={handleDeleteSelected} className={styles["motion_div_sub2__delete"]}>Delete</div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

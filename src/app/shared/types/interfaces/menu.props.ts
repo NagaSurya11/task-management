@@ -15,5 +15,5 @@ export interface MenuProps<T> {
     id: string;
     children: React.ReactNode;
     align: "center" | "end" | "start";
-    secondary?: boolean;
+    type: 'primary' | 'secondary' | 'tertiary';
 }

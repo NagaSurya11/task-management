@@ -63,7 +63,7 @@ export function Filter() {
       <div className={styles['filter_container_cd_root']}>
         <div className={styles['filter_container_cd']}>
           Filter by :
-          <Menu id='category-filter' key={'category-filter'} align='center' onClick={(value: Category) => updateCategory(value)} options={Categories}>
+          <Menu id='category-filter' key={'category-filter'} align='center' type='primary' onClick={(value: Category) => updateCategory(value)} options={Categories}>
             <div className={`${styles['filter_container_select_btn']} ${!!category ? styles['active'] : ''}`}>
               {!!category ? category : 'Category'}
               <Icon icon={Icons.CHEVRON_DOWN_OUTLINE} height={18} width={18} />

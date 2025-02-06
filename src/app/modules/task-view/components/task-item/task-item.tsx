@@ -14,10 +14,11 @@ import styles from './task-item.module.css';
 import Icon from 'src/app/shared/components/icon/icon';
 import Menu from 'src/app/shared/components/menu/menu';
 import { clone, cloneDeep, isEqual } from 'lodash';
-import { useDispatch } from 'react-redux';
-import { deleteTask, editTask, taskViewActions } from 'src/app/shared/store/task-view/task-view.slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteTask, editTask, selectSelectedTasks, taskViewActions } from 'src/app/shared/store/task-view/task-view.slice';
 import { AppDispatch } from 'src/main';
 import Checkbox from 'src/app/shared/components/checkbox/check-box';
+import { TaskStatusMenuOptions } from 'src/app/shared/types/constants/task-status-menu-options';
 
 export interface TaskItemProps {
   task: Task;
@@ -59,6 +60,7 @@ const CategoryContextMenuComponent: React.FC<Task> = (props) => {
       id={id as string}
       key={id as string}
       align="end"
+      type='primary'
     >
       <div>
         <Icon
@@ -96,26 +98,10 @@ const BoardTaskItem: React.FC<Task> = (props) => {
   );
 };
 
-export const TaskStatusMenuOptions: MenuOptions<TaskStatus> = [
-  {
-    label: TaskStatus.TODO,
-    value: TaskStatus.TODO
-  },
-  {
-    label: TaskStatus.IN_PROGRESS,
-    value: TaskStatus.IN_PROGRESS
-  },
-  {
-    label: TaskStatus.COMPLETED,
-    value: TaskStatus.COMPLETED
-  }
-]
-
 const ListTaskItem: React.FC<Task> = (props) => {
 
   const { category, dueOn, id, name, status, activity } = props;
-  const [checked, setChecked] = useState(false);
-  const changeChecked = () => setChecked(!checked);
+  const checked = useSelector(selectSelectedTasks).ids[id];
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -133,6 +119,7 @@ const ListTaskItem: React.FC<Task> = (props) => {
   }, [status]);
 
   const isCompleted = useMemo(() => isEqual(status, TaskStatus.COMPLETED) ? 'completed' : '', []);
+  const changeChecked = useCallback(() => dispatch(taskViewActions.selectOrDeselectTask(id)), [id]);
 
   return (
     <div className={styles['task_list_item']}>
@@ -144,7 +131,7 @@ const ListTaskItem: React.FC<Task> = (props) => {
       </div>
       <div className={styles["task_list_item__dueOn"]}>{dueOn}</div>
       <div className={styles["task_list_item__status"]}>
-        <Menu id='task_list_item__status' align='center' options={clone(TaskStatusMenuOptions)} onClick={handleTaskStatusChange} secondary>
+        <Menu id='task_list_item__status' align='center' options={clone(TaskStatusMenuOptions)} onClick={handleTaskStatusChange} type='primary'>
           <div className={styles['task_list_item__status__btn']}>{status}</div>
         </Menu>
       </div>

@@ -18,8 +18,17 @@
     background-color: var(--background-primary-dark);
     border-color: var(--background-primary-dark);
     color: var(--background-secondary-light);
+    text-decoration: none;
+    display: initial;
 }
 
 .checkbox:checked::after {
     content: '\2714';
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    bottom: 1px;
+    left: 1px;
 }

@@ -12,7 +12,7 @@ export function Menu<T>(props: MenuProps<T>) {
     <Root >
       <Trigger asChild children={props.children} />
       <Portal>
-        <Content side='bottom' align='end' sideOffset={5} alignOffset={5} className={`${styles['menu']} ${styles[props.secondary ? 'secondary' : '']}`}>
+        <Content side='bottom' align='end' sideOffset={5} alignOffset={5} className={`${styles['menu']} ${styles[props.type]}`}>
           {props.options.map((option) => (
             <Item className={`${styles['menu_item']} ${option.warn ? styles['warn']: ''}`} key={option.label} id={option.label} onSelect={() => props.onClick(option.value)}>
               {option.icon && <Icon icon={option.icon} height={16} width={16} />}

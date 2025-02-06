@@ -141,7 +141,7 @@ export const TaskDetailsContainer: React.FC<TaskDetailsProps> = (props) => {
                     <div className={styles['task_details_container__cds__status__label']}>
                         Task Status*
                     </div>
-                    <Menu id='task_details_container__cds__status__menu' key={'task_details_container__cds__status__menu'} align='center' onClick={setTaskStatus} options={taskStatusMenuOptions}>
+                    <Menu type="primary" id='task_details_container__cds__status__menu' key={'task_details_container__cds__status__menu'} align='center' onClick={setTaskStatus} options={taskStatusMenuOptions}>
                         <div className={`${styles['task_details_container__cds__status_btn']} ${!!taskStatus ? styles['active'] : ''}`}>
                             {!!taskStatus ? taskStatus : 'Choose'}
                             <Icon icon={Icons.CHEVRON_DOWN_OUTLINE} height={18} width={18} />

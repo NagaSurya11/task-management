@@ -34,6 +34,15 @@
     outline: unset;
 }
 
-.menu.secondary {
+.secondary {
     background: var(--background-secondary-light);
+}
+
+.tertiary {
+    background: var(--background-dark);
+    color: var(--text-inverted);
+}
+
+.tertiary .menu_item:hover {
+    color: var(--text-primary);
 }
