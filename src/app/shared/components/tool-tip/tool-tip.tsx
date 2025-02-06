@@ -4,7 +4,6 @@ import "./tool-tip.css";
 import { Arrow, Content, Portal, Root, Trigger } from "@radix-ui/react-dropdown-menu";
 
 const Tooltip: React.FC<{toolTip?: string, children: React.ReactNode}> = (props) => {
-    console.log(props.toolTip)
     if (!props.toolTip) {
         return props.children;
     }
